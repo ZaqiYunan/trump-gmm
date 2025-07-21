@@ -4,8 +4,11 @@ class Character {
   PImage walkRight;
   PImage walkLeft;
   PImage standImage;
+  PImage sholatImage;
+  boolean isSholat = false;
   float x, y;
   float scale; // VARIABEL BARU untuk menyimpan skala
+  float sholatScale = 1.0;
   int frameCount = 0;
   int frameDelay = 10;
 
@@ -34,9 +37,19 @@ class Character {
     frameCount++;
   }
 
+  void setSholatImage(String path) {
+    sholatImage = loadImage(path);
+  }
+
+  void setSholatScale(float scale) {
+    sholatScale = scale;
+  }
+
   // Method display yang sekarang menggunakan scale
   void display() {
-    if (standImage != null) {
+    if (isSholat && sholatImage != null) {
+      image(sholatImage, x, y, sholatImage.width * sholatScale, sholatImage.height * sholatScale);
+    } else if (standImage != null) {
       // Gambar karakter diam dengan ukuran yang sudah diskalakan
       image(standImage, x, y, standImage.width * scale, standImage.height * scale);
     } 

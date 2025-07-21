@@ -1,3 +1,8 @@
+//import processing.sound.*;
+
+//// 2. Deklarasi variabel untuk DUA file suara
+//SoundFile musikPagi;
+//SoundFile suaraBurung;
 //PGraphics backgroundLayer;
 //ArrayList<Cloud> clouds = new ArrayList<Cloud>();
 //ArrayList<Star> stars = new ArrayList<Star>();
@@ -9,6 +14,10 @@
 //boolean remajaHasStopped = false;
 //float timeOfDay = 0; // 0 = pagi, 1 = siang, 2 = sore, 3 = malam
 //boolean isNight = false;
+//float ustadTargetY = 300;   // Y masjid (atur sesuai posisi masjid di background)
+//float remajaTargetY = 300;
+//boolean ustadMasukMasjid = false;
+//boolean remajaMasukMasjid = false;
 
 //void setup() {
 //  size(1300, 720);
@@ -21,7 +30,7 @@
 //  "assets/characters/UstadKanan.png",
 //  "assets/characters/UstadKiri.png",
 //  -150,
-//  480,
+//  400,
 //  1.0 // Skala 1.0 berarti ukuran normal
 //);
   
@@ -29,33 +38,64 @@
 //  "assets/characters/RemajaKanan.png",
 //  "assets/characters/RemajaKiri.png",
 //  -250,
-//  480,
+//  400,
 //  0.3 // Skala 0.8 berarti 80% dari ukuran asli (lebih kecil)
 //);
+//musikPagi = new SoundFile(this, "morning.mp3");
+//  suaraBurung = new SoundFile(this, "birds.mp3");
+  
+//  // Atur volume agar seimbang (opsional, tapi disarankan)
+//  musikPagi.amp(0.7);   // Musik diatur ke 70% volume
+//  suaraBurung.amp(0.5); // Suara burung lebih pelan, sebagai ambien
+  
+//  // Putar kedua suara secara berulang (loop)
+//  musikPagi.loop();
+//  suaraBurung.loop();
 //}
+
 
 //void draw() {
 //  image(backgroundLayer, 0, 0);
 //  drawMovingClouds();
   
 //   if (!ustadHasStopped) {
-//    ustad.move(2.0); // Kecepatan jalan Ustad
+//    ustad.move(1.0); // Kecepatan jalan Ustad
 //    if (ustad.x >= ustadStopX) {
 //      ustadHasStopped = true;
 //      ustad.x = ustadStopX;
 //    }
 //  }
-//  ustad.display();
+//  // Setelah ustad berhenti horizontal, jalan vertikal ke masjid
+//  if (ustadHasStopped && !ustadMasukMasjid) {
+//    if (ustad.y > ustadTargetY) {
+//      ustad.y -= 2;
+//      if (ustad.y <= ustadTargetY) {
+//        ustad.y = ustadTargetY;
+//        ustadMasukMasjid = true;
+//      }
+//    }
+//  }
+//  if (!ustadMasukMasjid) ustad.display();
   
 //  // Logika untuk Remaja
 //  if (!remajaHasStopped) {
-//    remaja.move(2.0); // Remaja berjalan sedikit lebih cepat
+//    remaja.move(1.0); // Remaja berjalan sedikit lebih cepat
 //    if (remaja.x >= remajaStopX) {
 //      remajaHasStopped = true;
 //      remaja.x = remajaStopX;
 //    }
 //  }
-//  remaja.display();
+//  // Setelah remaja berhenti horizontal, jalan vertikal ke masjid
+//  if (remajaHasStopped && !remajaMasukMasjid) {
+//    if (remaja.y > remajaTargetY) {
+//      remaja.y -= 2;
+//      if (remaja.y <= remajaTargetY) {
+//        remaja.y = remajaTargetY;
+//        remajaMasukMasjid = true;
+//      }
+//    }
+//  }
+//  if (!remajaMasukMasjid) remaja.display();
   
   
 //  if (isNight) {
@@ -71,6 +111,67 @@
 //      isNight = false;
 //    }
 //    generateStaticBackground();
+//  }
+
+//  // Dynamic speech variables for Scene 4
+//  String[] speechTexts = {
+//    "Anak-anak muda tersebut menerima ajakan dari ustaz tersebut. Mereka pun berjalan bersama menuju masjid sambil berbincang ringan."
+//  };
+//  String[] speakers = {
+//    "--"
+//  };
+//  int currentSpeechIndex = 0;
+//  int speechDuration = 8000; // milliseconds per line
+//  int lastSpeechChange = 0;  // time of last change
+//  int typingSpeed = 65; // milliseconds per character
+//  int charsToShow = 0;
+//  int fadeDuration = 500; // milliseconds for fade in/out
+//  int boxAlpha = 0;       // current alpha value (0-255)
+//  int displayTime = 2000; // ms to show full text before fade out
+//  boolean dialogueFinished = false;
+
+//  int totalChars = speechTexts[currentSpeechIndex].length();
+//  int elapsed = millis() - lastSpeechChange;
+//  int typingTime = totalChars * typingSpeed;
+//  int fadeOutStart = fadeDuration + typingTime + displayTime;
+//  int fadeOutEnd = fadeOutStart + fadeDuration;
+
+//  if (dialogueFinished) {
+//    boxAlpha = 0;
+//  } else if (elapsed < fadeDuration) {
+//    boxAlpha = int(map(elapsed, 0, fadeDuration, 0, 255));
+//  } else if (elapsed < fadeDuration + typingTime) {
+//    boxAlpha = 255;
+//  } else if (elapsed < fadeOutStart) {
+//    boxAlpha = 255;
+//  } else if (elapsed < fadeOutEnd) {
+//    boxAlpha = int(map(elapsed, fadeOutStart, fadeOutEnd, 255, 0));
+//  } else if (!dialogueFinished) {
+//    currentSpeechIndex++;
+//    if (currentSpeechIndex >= speechTexts.length) {
+//      dialogueFinished = true;
+//      currentSpeechIndex = speechTexts.length - 1;
+//      boxAlpha = 0;
+//    } else {
+//      lastSpeechChange = millis();
+//      charsToShow = 0;
+//      boxAlpha = 0;
+//    }
+//  }
+
+//  if (!dialogueFinished && elapsed < fadeDuration + typingTime) {
+//    charsToShow = min(totalChars, max(0, (elapsed - fadeDuration) / typingSpeed));
+//  } else {
+//    charsToShow = totalChars;
+//  }
+
+//  if (!dialogueFinished || boxAlpha > 0) {
+//    drawSpeechBox(
+//      speakers[currentSpeechIndex],
+//      speechTexts[currentSpeechIndex].substring(0, min(charsToShow, speechTexts[currentSpeechIndex].length())),
+//      300, height - 120 - 40, 700, 120,
+//      boxAlpha
+//    );
 //  }
 //}
 
@@ -110,23 +211,19 @@
 
 //void drawGradientSky(PGraphics pg) {
 //  pg.noFill();
-  
-//  if (isNight) {
-//    // Langit malam
-//    for (int i = 0; i <= height/2; i++) {
-//      float inter = map(i, 0, height/2, 0, 1);
-//      color c = lerpColor(color(10, 10, 30), color(30, 30, 60), inter);
-//      pg.stroke(c);
-//      pg.line(0, i, width, i);
+//  for (int i = 0; i <= height / 2; i++) {
+//    float inter = map(i, 0, height / 2, 0, 1);
+//    color c;
+//    if (isNight) {
+//      c = lerpColor(color(10, 10, 30), color(30, 30, 60), inter);
+//    } else {
+//      // WARNA LANGIT SENJA (MAGRIB)
+//      color biruAtas = color(135, 206, 250); // Biru muda di bagian atas
+//      color jinggaBawah = color(255, 165, 0, 200); // Oranye/jingga di cakrawala
+//      c = lerpColor(biruAtas, jinggaBawah, inter);
 //    }
-//  } else {
-//    // Langit siang dengan gradasi
-//    for (int i = 0; i <= height/2; i++) {
-//      float inter = map(i, 0, height/2, 0, 1);
-//      color c = lerpColor(color(135, 206, 250), color(255, 255, 255), inter);
-//      pg.stroke(c);
-//      pg.line(0, i, width, i);
-//    }
+//    pg.stroke(c);
+//    pg.line(0, i, width, i);
 //  }
 //}
 
@@ -785,4 +882,33 @@
 //  text("Tekan SPASI untuk mengubah waktu", 20, 30);
 //  text("Tekan R untuk reset", 20, 45);
 //  text("Awan bergerak otomatis", 20, 60);
+//}
+
+//void drawSpeechBox(String speaker, String text, int x, int y, int w, int h, int alpha) {
+//  // Box background
+//  fill(20, 22, 40, alpha); // dark blue
+//  stroke(80, 80, 120, alpha); // lighter border
+//  strokeWeight(4);
+//  rect(x, y, w, h, 0);
+
+//  // Pixel corners (optional, for extra style)
+//  int cornerSize = 12;
+//  fill(60, 60, 100, alpha);
+//  noStroke();
+//  rect(x, y, cornerSize, cornerSize);
+//  rect(x + w - cornerSize, y, cornerSize, cornerSize);
+//  rect(x, y + h - cornerSize, cornerSize, cornerSize);
+//  rect(x + w - cornerSize, y + h - cornerSize, cornerSize, cornerSize);
+
+//  // Speaker name
+//  fill(150, 150, 200, alpha);
+//  textAlign(LEFT, TOP);
+//  textSize(24);
+//  text(speaker, x + 20, y + 10);
+
+//  // Speech text
+//  fill(255, alpha);
+//  textSize(20);
+//  textLeading(28);
+//  text(text, x + 20, y + 50, w - 40, h - 60);
 //}
