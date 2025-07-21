@@ -1,482 +1,484 @@
-//float awanX1 = 100;
-//float awanX2 = 300;
-//Character ustad;
-//PGraphics backgroundLayer;
-//ArrayList<Cloud> clouds = new ArrayList<Cloud>();
-//ArrayList<Star> stars = new ArrayList<Star>();
-//float timeOfDay = 0; // 0 = pagi, 1 = siang, 2 = sore, 3 = malam
-//boolean isNight = false;
+float awanX1 = 100;
+float awanX2 = 300;
+Character ustad;
+PGraphics backgroundLayer;
+ArrayList<Cloud> clouds = new ArrayList<Cloud>();
+ArrayList<Star> stars = new ArrayList<Star>();
+float timeOfDay = 0; // 0 = pagi, 1 = siang, 2 = sore, 3 = malam
+boolean isNight = false;
 
-//// Dynamic speech variables
-//String[] speechTexts = {
-//  "Pada sore hari, seorang ustaz melangkah dari rumah nya untuk pergi menuju masjid.",
-//  "Ustaz tersebut ingin menunaikan salat berjamaah, hatinya tenang, langkahnya mantap dan menyambut panggilan Allah dengan penuh keikhlasan."
-//};
-//String[] speakers = {
-//  "--",
-//  "--"
-//};
-//int currentSpeechIndex = 0;
-//int speechDuration = 8000; // milliseconds per line
-//int lastSpeechChange = 0;  // time of last change
-//int typingSpeed = 65; // milliseconds per character
-//int charsToShow = 0;
-//int fadeDuration = 500; // milliseconds for fade in/out
-//int boxAlpha = 0;       // current alpha value (0-255)
-//int displayTime = 2000; // ms to show full text before fade out
+// Dynamic speech variables
+String[] speechTexts = {
+  "Pada sore hari, seorang ustaz melangkah dari rumah nya untuk pergi menuju masjid.",
+  "Ustaz tersebut ingin menunaikan salat berjamaah, hatinya tenang, langkahnya mantap dan menyambut panggilan Allah dengan penuh keikhlasan."
+};
+String[] speakers = {
+  "--",
+  "--"
+};
+int currentSpeechIndex = 0;
+int speechDuration = 8000; // milliseconds per line
+int lastSpeechChange = 0;  // time of last change
+int typingSpeed = 65; // milliseconds per character
+int charsToShow = 0;
+int fadeDuration = 500; // milliseconds for fade in/out
+int boxAlpha = 0;       // current alpha value (0-255)
+int displayTime = 2000; // ms to show full text before fade out
+boolean dialogueFinished = false;
 
-//// Enhanced Ripple class for detailed river animation
-//class Ripple {
-//  float x, y, length, speed, thickness, alpha, phase, waveAmp, waveFreq;
-//  Ripple(float x, float y, float length, float speed, float thickness, float alpha, float waveAmp, float waveFreq) {
-//    this.x = x;
-//    this.y = y;
-//    this.length = length;
-//    this.speed = speed;
-//    this.thickness = thickness;
-//    this.alpha = alpha;
-//    this.phase = random(TWO_PI);
-//    this.waveAmp = waveAmp;
-//    this.waveFreq = waveFreq;
-//  }
-//  void move() {
-//    x += speed;
-//    if (x > width) {
-//      x = -length;
-//      y = 385 + random(40);
-//      phase = random(TWO_PI);
-//    }
-//    phase += 0.01;
-//  }
-//  void display() {
-//    stroke(174, 234, 249, alpha);
-//    strokeWeight(thickness);
-//    noFill();
-//    beginShape();
-//    for (float i = 0; i < length; i += 2) {
-//      float wave = sin(phase + i * waveFreq) * waveAmp;
-//      vertex(x + i, y + wave);
-//    }
-//    endShape();
-//    noStroke();
-//  }
-//}
-//ArrayList<Ripple> ripples = new ArrayList<Ripple>();
-//PGraphics shadowBuffer;
+// Enhanced Ripple class for detailed river animation
+class Ripple {
+  float x, y, length, speed, thickness, alpha, phase, waveAmp, waveFreq;
+  Ripple(float x, float y, float length, float speed, float thickness, float alpha, float waveAmp, float waveFreq) {
+    this.x = x;
+    this.y = y;
+    this.length = length;
+    this.speed = speed;
+    this.thickness = thickness;
+    this.alpha = alpha;
+    this.phase = random(TWO_PI);
+    this.waveAmp = waveAmp;
+    this.waveFreq = waveFreq;
+  }
+  void move() {
+    x += speed;
+    if (x > width) {
+      x = -length;
+      y = 385 + random(40);
+      phase = random(TWO_PI);
+    }
+    phase += 0.01;
+  }
+  void display() {
+    stroke(174, 234, 249, alpha);
+    strokeWeight(thickness);
+    noFill();
+    beginShape();
+    for (float i = 0; i < length; i += 2) {
+      float wave = sin(phase + i * waveFreq) * waveAmp;
+      vertex(x + i, y + wave);
+    }
+    endShape();
+    noStroke();
+  }
+}
+ArrayList<Ripple> ripples = new ArrayList<Ripple>();
+PGraphics shadowBuffer;
 
-//void setup() {
-//  size(1300, 720);
-//  frameRate(30);
-//  backgroundLayer = createGraphics(width, height);
-//  generateBackground();
-//  initClouds();
-//  initStars();
-//  ustad = new Character("assets/characters/UstadKanan.png", "assets/characters/UstadKiri.png", -150, 480, 1.0); 
-//  // Initialize detailed river ripples
-//  for (int i = 0; i < 15; i++) {
-//    float x = random(width);
-//    float y = 385 + random(40);
-//    float length = random(20, 60);
-//    float speed = random(0.4, 1.0);
-//    float thickness = random(1, 2.5);
-//    float alpha = random(80, 180);
-//    float waveAmp = random(1, 4);
-//    float waveFreq = random(0.08, 0.18);
-//    ripples.add(new Ripple(x, y, length, speed, thickness, alpha, waveAmp, waveFreq));
-//  }
-//  // Create shadow buffer for soft shadow
-//  shadowBuffer = createGraphics(120, 40);
-//  shadowBuffer.beginDraw();
-//  shadowBuffer.noStroke();
-//  for (int i = 20; i > 0; i--) {
-//    shadowBuffer.fill(0, 30 - i, 60 - i * 2);
-//    shadowBuffer.ellipse(shadowBuffer.width/2, shadowBuffer.height/2, 100 + i*2, 30 + i);
-//  }
-//  shadowBuffer.endDraw();
-//}
+void setup() {
+  size(1300, 720);
+  frameRate(30);
+  backgroundLayer = createGraphics(width, height);
+  generateBackground();
+  initClouds();
+  initStars();
+  ustad = new Character("assets/characters/UstadKanan.png", "assets/characters/UstadKiri.png", -150, 480, 1.0); 
+  // Initialize detailed river ripples
+  for (int i = 0; i < 15; i++) {
+    float x = random(width);
+    float y = 385 + random(40);
+    float length = random(20, 60);
+    float speed = random(0.4, 1.0);
+    float thickness = random(1, 2.5);
+    float alpha = random(80, 180);
+    float waveAmp = random(1, 4);
+    float waveFreq = random(0.08, 0.18);
+    ripples.add(new Ripple(x, y, length, speed, thickness, alpha, waveAmp, waveFreq));
+  }
+  // Create shadow buffer for soft shadow
+  shadowBuffer = createGraphics(120, 40);
+  shadowBuffer.beginDraw();
+  shadowBuffer.noStroke();
+  for (int i = 20; i > 0; i--) {
+    shadowBuffer.fill(0, 30 - i, 60 - i * 2);
+    shadowBuffer.ellipse(shadowBuffer.width/2, shadowBuffer.height/2, 100 + i*2, 30 + i);
+  }
+  shadowBuffer.endDraw();
+}
 
-//void draw() {
-//  image(backgroundLayer, 0, 0);
+void draw() {
+  image(backgroundLayer, 0, 0);
   
-//  // Awan bergerak dari kode lama
-//  drawCloud(awanX1, 80);
-//  drawCloud(awanX2, 120);
-//  awanX1 += 0.3;
-//  awanX2 += 0.2;
-//  if (awanX1 > width + 100) awanX1 = -100;
-//  if (awanX2 > width + 100) awanX2 = -100;
+  // Awan bergerak dari kode lama
+  drawCloud(awanX1, 80);
+  drawCloud(awanX2, 120);
+  awanX1 += 0.3;
+  awanX2 += 0.2;
+  if (awanX1 > width + 100) awanX1 = -100;
+  if (awanX2 > width + 100) awanX2 = -100;
   
-//  // Awan bergerak dari kode baru
-//  drawMovingClouds();
+  // Awan bergerak dari kode baru
+  drawMovingClouds();
   
-//  // Bintang untuk malam
-//  if (isNight) {
-//    drawStars();
-//  }
+  // Bintang untuk malam
+  if (isNight) {
+    drawStars();
+  }
   
-//  // Riak air sungai
-//  drawRiverRipples();
+  // Riak air sungai
+  drawRiverRipples();
   
-//  ustad.move(2.5); // Gerakkan karakter dengan kecepatan 4.5
-//  // Draw soft shadow directly below character's feet
-//  float charWidth = 120 * ustad.scale;
-//  float charHeight = 180 * ustad.scale;
-//  float shadowX = ustad.x + charWidth / 2;
-//  float shadowY = ustad.y + charHeight + 40 * ustad.scale; // moved further down
-//  float shadowW = charWidth * 0.7;
-//  float shadowH = charHeight * 0.18;
-//  pushMatrix();
-//  translate(shadowX, shadowY);
-//  scale(shadowW / shadowBuffer.width, shadowH / shadowBuffer.height);
-//  imageMode(CENTER);
-//  image(shadowBuffer, 0, 0);
-//  imageMode(CORNER);
-//  popMatrix();
-//  ustad.display(); // Tampilkan karakter ke layar
+  ustad.move(2.5); // Gerakkan karakter dengan kecepatan 4.5
+  // Draw soft shadow directly below character's feet
+  float charWidth = 120 * ustad.scale;
+  float charHeight = 180 * ustad.scale;
+  float shadowX = ustad.x + charWidth / 2;
+  float shadowY = ustad.y + charHeight + 40 * ustad.scale; // moved further down
+  float shadowW = charWidth * 0.7;
+  float shadowH = charHeight * 0.18;
+  pushMatrix();
+  translate(shadowX, shadowY);
+  scale(shadowW / shadowBuffer.width, shadowH / shadowBuffer.height);
+  imageMode(CENTER);
+  image(shadowBuffer, 0, 0);
+  imageMode(CORNER);
+  popMatrix();
+  ustad.display(); // Tampilkan karakter ke layar
 
-//  // Improved fade and typing effect for speech box
-//  int totalChars = speechTexts[currentSpeechIndex].length();
-//  int elapsed = millis() - lastSpeechChange;
-//  int typingTime = totalChars * typingSpeed;
-//  int fadeOutStart = fadeDuration + typingTime + displayTime;
-//  int fadeOutEnd = fadeOutStart + fadeDuration;
+  // Improved fade and typing effect for speech box
+  int totalChars = speechTexts[currentSpeechIndex].length();
+  int elapsed = millis() - lastSpeechChange;
+  int typingTime = totalChars * typingSpeed;
+  int fadeOutStart = fadeDuration + typingTime + displayTime;
+  int fadeOutEnd = fadeOutStart + fadeDuration;
 
-//  if (elapsed < fadeDuration) {
-//    // Fade in
-//    boxAlpha = int(map(elapsed, 0, fadeDuration, 0, 255));
-//  } else if (elapsed < fadeDuration + typingTime) {
-//    // Typing
-//    boxAlpha = 255;
-//  } else if (elapsed < fadeOutStart) {
-//    // Full text display
-//    boxAlpha = 255;
-//  } else if (elapsed < fadeOutEnd) {
-//    // Fade out
-//    boxAlpha = int(map(elapsed, fadeOutStart, fadeOutEnd, 255, 0));
-//  } else {
-//    // Next line
-//    currentSpeechIndex++;
-//    if (currentSpeechIndex >= speechTexts.length) {
-//      currentSpeechIndex = 0;
-//    }
-//    lastSpeechChange = millis();
-//    charsToShow = 0;
-//    boxAlpha = 0;
-//  }
+  if (dialogueFinished) {
+    boxAlpha = 0;
+  } else if (elapsed < fadeDuration) {
+    boxAlpha = int(map(elapsed, 0, fadeDuration, 0, 255));
+  } else if (elapsed < fadeDuration + typingTime) {
+    boxAlpha = 255;
+  } else if (elapsed < fadeOutStart) {
+    boxAlpha = 255;
+  } else if (elapsed < fadeOutEnd) {
+    boxAlpha = int(map(elapsed, fadeOutStart, fadeOutEnd, 255, 0));
+  } else if (!dialogueFinished) {
+    currentSpeechIndex++;
+    if (currentSpeechIndex >= speechTexts.length) {
+      dialogueFinished = true;
+      currentSpeechIndex = speechTexts.length - 1;
+      boxAlpha = 0;
+    } else {
+      lastSpeechChange = millis();
+      charsToShow = 0;
+      boxAlpha = 0;
+    }
+  }
 
-//  // Typing effect only during fade-in and typing
-//  if (elapsed < fadeDuration + typingTime) {
-//    charsToShow = min(totalChars, max(0, (elapsed - fadeDuration) / typingSpeed));
-//  } else {
-//    charsToShow = totalChars;
-//  }
+  if (!dialogueFinished && elapsed < fadeDuration + typingTime) {
+    charsToShow = min(totalChars, max(0, (elapsed - fadeDuration) / typingSpeed));
+  } else {
+    charsToShow = totalChars;
+  }
 
-//  // Draw the speech box with the substring and alpha
-//  drawSpeechBox(
-//    speakers[currentSpeechIndex],
-//    speechTexts[currentSpeechIndex].substring(0, min(charsToShow, speechTexts[currentSpeechIndex].length())),
-//    300, 125, 700, 120,
-//    boxAlpha
-//  );
-//}
+  // Draw the speech box only if not finished or fading out
+  if (!dialogueFinished || boxAlpha > 0) {
+    drawSpeechBox(
+      speakers[currentSpeechIndex],
+      speechTexts[currentSpeechIndex].substring(0, min(charsToShow, speechTexts[currentSpeechIndex].length())),
+      300, 125, 700, 120,
+      boxAlpha
+    );
+  }
+}
 
-//void generateBackground() {
-//  backgroundLayer.beginDraw();
+void generateBackground() {
+  backgroundLayer.beginDraw();
   
-//  // Langit dengan gradasi berdasarkan waktu (dari kode baru)
-//  drawGradientSky(backgroundLayer);
+  // Langit dengan gradasi berdasarkan waktu (dari kode baru)
+  drawGradientSky(backgroundLayer);
   
-//  // Gunung berlapis dengan perspektif (dari kode baru)
-//  drawMountainLayers(backgroundLayer);
+  // Gunung berlapis dengan perspektif (dari kode baru)
+  drawMountainLayers(backgroundLayer);
   
-//  // Sawah dengan detail (dari kode baru)
-//  drawRiceFields(backgroundLayer);
+  // Sawah dengan detail (dari kode baru)
+  drawRiceFields(backgroundLayer);
   
-//  // Sungai
-//  backgroundLayer.fill(#4AC7F2);
-//  backgroundLayer.rect(0, 380, width, 50);
+  // Sungai
+  backgroundLayer.fill(#4AC7F2);
+  backgroundLayer.rect(0, 380, width, 50);
   
-//  // Jalan tanah
-//  backgroundLayer.fill(#B07D53);
-//  backgroundLayer.rect(0, 430, width, height - 430);
+  // Jalan tanah
+  backgroundLayer.fill(#B07D53);
+  backgroundLayer.rect(0, 430, width, height - 430);
   
-//  // Pohon-pohon dengan variasi (dari kode baru)
-//  drawStaticTree(backgroundLayer, 100, 330, 1.2);
-//  drawStaticTree(backgroundLayer, 180, 330, 1.0);
-//  drawStaticTree(backgroundLayer, 260, 330, 0.8);
-//  drawStaticTree(backgroundLayer, 580, 330, 1.1);
-//  drawStaticTree(backgroundLayer, 680, 330, 0.9);
+  // Pohon-pohon dengan variasi (dari kode baru)
+  drawStaticTree(backgroundLayer, 100, 330, 1.2);
+  drawStaticTree(backgroundLayer, 180, 330, 1.0);
+  drawStaticTree(backgroundLayer, 260, 330, 0.8);
+  drawStaticTree(backgroundLayer, 580, 330, 1.1);
+  drawStaticTree(backgroundLayer, 680, 330, 0.9);
   
-//  // Pagar
-//  backgroundLayer.stroke(#000000);
-//  backgroundLayer.strokeWeight(4);
-//  for (int x = 0; x <= width; x += 50) {
-//    backgroundLayer.line(x, 440, x, 460);
-//    if (x + 50 <= width) {
-//      backgroundLayer.line(x, 440, x + 50, 440);
-//    } else {
-//      backgroundLayer.line(x, 440, width, 440);
-//    }
-//  }
+  // Pagar
+  backgroundLayer.stroke(#000000);
+  backgroundLayer.strokeWeight(4);
+  for (int x = 0; x <= width; x += 50) {
+    backgroundLayer.line(x, 440, x, 460);
+    if (x + 50 <= width) {
+      backgroundLayer.line(x, 440, x + 50, 440);
+    } else {
+      backgroundLayer.line(x, 440, width, 440);
+    }
+  }
   
-//  backgroundLayer.endDraw();
-//}
+  backgroundLayer.endDraw();
+}
 
-//// Fungsi langit dengan gradasi dari kode baru
-//void drawGradientSky(PGraphics pg) {
-//  pg.noFill();
+// Fungsi langit dengan gradasi dari kode baru
+void drawGradientSky(PGraphics pg) {
+  pg.noFill();
   
-//  if (isNight) {
-//    // Langit malam
-//    for (int i = 0; i <= height/2; i++) {
-//      float inter = map(i, 0, height/2, 0, 1);
-//      color c = lerpColor(color(10, 10, 30), color(30, 30, 60), inter);
-//      pg.stroke(c);
-//      pg.line(0, i, width, i);
-//    }
-//  } else {
-//    // Langit siang dengan gradasi
-//    for (int i = 0; i <= height/2; i++) {
-//      float inter = map(i, 0, height/2, 0, 1);
-//      color c = lerpColor(color(135, 206, 250), color(255, 255, 255), inter);
-//      pg.stroke(c);
-//      pg.line(0, i, width, i);
-//    }
-//  }
-//}
+  if (isNight) {
+    // Langit malam
+    for (int i = 0; i <= height/2; i++) {
+      float inter = map(i, 0, height/2, 0, 1);
+      color c = lerpColor(color(10, 10, 30), color(30, 30, 60), inter);
+      pg.stroke(c);
+      pg.line(0, i, width, i);
+    }
+  } else {
+    // Langit siang dengan gradasi
+    for (int i = 0; i <= height/2; i++) {
+      float inter = map(i, 0, height/2, 0, 1);
+      color c = lerpColor(color(135, 206, 250), color(255, 255, 255), inter);
+      pg.stroke(c);
+      pg.line(0, i, width, i);
+    }
+  }
+}
 
-//// Fungsi gunung berlapis dari kode baru
-//void drawMountainLayers(PGraphics pg) {
-//  pg.noStroke();
+// Fungsi gunung berlapis dari kode baru
+void drawMountainLayers(PGraphics pg) {
+  pg.noStroke();
   
-//  // Gunung latar belakang (jauh)
-//  pg.fill(120, 150, 180, 150);
-//  pg.beginShape();
-//  pg.vertex(0, 200);
-//  for (int x = 0; x <= width; x += 15) {
-//    float y = 180 + 40 * noise(x * 0.005, 1000);
-//    pg.vertex(x, y);
-//  }
-//  pg.vertex(width, 250);
-//  pg.vertex(0, 250);
-//  pg.endShape(CLOSE);
+  // Gunung latar belakang (jauh)
+  pg.fill(120, 150, 180, 150);
+  pg.beginShape();
+  pg.vertex(0, 200);
+  for (int x = 0; x <= width; x += 15) {
+    float y = 180 + 40 * noise(x * 0.005, 1000);
+    pg.vertex(x, y);
+  }
+  pg.vertex(width, 250);
+  pg.vertex(0, 250);
+  pg.endShape(CLOSE);
   
-//  // Gunung tengah
-//  pg.fill(80, 120, 100, 200);
-//  pg.beginShape();
-//  pg.vertex(0, 220);
-//  for (int x = 0; x <= width; x += 20) {
-//    float y = 200 + 50 * noise(x * 0.008, 2000);
-//    pg.vertex(x, y);
-//  }
-//  pg.vertex(width, 280);
-//  pg.vertex(0, 280);
-//  pg.endShape(CLOSE);
+  // Gunung tengah
+  pg.fill(80, 120, 100, 200);
+  pg.beginShape();
+  pg.vertex(0, 220);
+  for (int x = 0; x <= width; x += 20) {
+    float y = 200 + 50 * noise(x * 0.008, 2000);
+    pg.vertex(x, y);
+  }
+  pg.vertex(width, 280);
+  pg.vertex(0, 280);
+  pg.endShape(CLOSE);
   
-//  // Gunung depan
-//  pg.fill(60, 100, 70);
-//  pg.beginShape();
-//  pg.vertex(0, 250);
-//  for (int x = 0; x <= width; x += 25) {
-//    float y = 230 + 60 * noise(x * 0.01, 3000);
-//    pg.vertex(x, y);
-//  }
-//  pg.vertex(width, 320);
-//  pg.vertex(0, 320);
-//  pg.endShape(CLOSE);
-//}
+  // Gunung depan
+  pg.fill(60, 100, 70);
+  pg.beginShape();
+  pg.vertex(0, 250);
+  for (int x = 0; x <= width; x += 25) {
+    float y = 230 + 60 * noise(x * 0.01, 3000);
+    pg.vertex(x, y);
+  }
+  pg.vertex(width, 320);
+  pg.vertex(0, 320);
+  pg.endShape(CLOSE);
+}
 
-//// Fungsi sawah dari kode baru
-//void drawRiceFields(PGraphics pg) {
-//  // Sawah dengan garis-garis detail
-//  pg.fill(108, 217, 77);
-//  pg.rect(0, 320, width, 60);
+// Fungsi sawah dari kode baru
+void drawRiceFields(PGraphics pg) {
+  // Sawah dengan garis-garis detail
+  pg.fill(108, 217, 77);
+  pg.rect(0, 320, width, 60);
   
-//  // Garis-garis sawah
-//  pg.stroke(90, 180, 60);
-//  pg.strokeWeight(1);
-//  for (int i = 0; i < 12; i++) {
-//    float y = 320 + i * 5;
-//    pg.line(0, y, width, y);
-//  }
+  // Garis-garis sawah
+  pg.stroke(90, 180, 60);
+  pg.strokeWeight(1);
+  for (int i = 0; i < 12; i++) {
+    float y = 320 + i * 5;
+    pg.line(0, y, width, y);
+  }
   
-//  // Pematang sawah
-//  pg.stroke(70, 140, 50);
-//  pg.strokeWeight(2);
-//  for (int x = 100; x < width; x += 200) {
-//    pg.line(x, 320, x, 380);
-//  }
-//  pg.noStroke();
-//}
+  // Pematang sawah
+  pg.stroke(70, 140, 50);
+  pg.strokeWeight(2);
+  for (int x = 100; x < width; x += 200) {
+    pg.line(x, 320, x, 380);
+  }
+  pg.noStroke();
+}
 
-//// Fungsi pohon dengan variasi dari kode baru
-//void drawStaticTree(PGraphics pg, int x, int y, float scale) {
-//  pg.pushMatrix();
-//  pg.translate(x, y);
-//  pg.scale(scale);
+// Fungsi pohon dengan variasi dari kode baru
+void drawStaticTree(PGraphics pg, int x, int y, float scale) {
+  pg.pushMatrix();
+  pg.translate(x, y);
+  pg.scale(scale);
   
-//  // Batang pohon dengan tekstur
-//  pg.fill(74, 47, 29);
-//  pg.rect(-5, 0, 10, 40);
+  // Batang pohon dengan tekstur
+  pg.fill(74, 47, 29);
+  pg.rect(-5, 0, 10, 40);
   
-//  // Tekstur batang
-//  pg.stroke(60, 35, 20);
-//  pg.strokeWeight(1);
-//  for (int i = 0; i < 5; i++) {
-//    pg.line(-4, i * 8, 4, i * 8);
-//  }
-//  pg.noStroke();
+  // Tekstur batang
+  pg.stroke(60, 35, 20);
+  pg.strokeWeight(1);
+  for (int i = 0; i < 5; i++) {
+    pg.line(-4, i * 8, 4, i * 8);
+  }
+  pg.noStroke();
   
-//  // Daun berlapis
-//  pg.fill(47, 112, 51, 200);
-//  pg.ellipse(0, -15, 45, 45);
-//  pg.ellipse(-15, -5, 40, 40);
-//  pg.ellipse(15, -5, 40, 40);
-//  pg.ellipse(0, 5, 35, 35);
+  // Daun berlapis
+  pg.fill(47, 112, 51, 200);
+  pg.ellipse(0, -15, 45, 45);
+  pg.ellipse(-15, -5, 40, 40);
+  pg.ellipse(15, -5, 40, 40);
+  pg.ellipse(0, 5, 35, 35);
   
-//  // Highlight daun
-//  pg.fill(80, 150, 80, 150);
-//  pg.ellipse(-5, -20, 25, 25);
-//  pg.ellipse(5, -10, 20, 20);
+  // Highlight daun
+  pg.fill(80, 150, 80, 150);
+  pg.ellipse(-5, -20, 25, 25);
+  pg.ellipse(5, -10, 20, 20);
   
-//  pg.popMatrix();
-//}
+  pg.popMatrix();
+}
 
-//// ==========================
-////        Awan & Bintang
-//// ==========================
-//class Cloud {
-//  float x, y, speed, size;
-//  Cloud(float x, float y, float speed, float size) {
-//    this.x = x;
-//    this.y = y;
-//    this.speed = speed;
-//    this.size = size;
-//  }
+// ==========================
+//        Awan & Bintang
+// ==========================
+class Cloud {
+  float x, y, speed, size;
+  Cloud(float x, float y, float speed, float size) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.size = size;
+  }
   
-//  void move() {
-//    x += speed;
-//    if (x > width + 100) x = -150;
-//  }
+  void move() {
+    x += speed;
+    if (x > width + 100) x = -150;
+  }
   
-//  void display() {
-//    fill(255, isNight ? 100 : 230);
-//    noStroke();
-//    ellipse(x, y, 80 * size, 50 * size);
-//    ellipse(x + 25 * size, y + 12 * size, 60 * size, 35 * size);
-//    ellipse(x - 25 * size, y + 12 * size, 60 * size, 35 * size);
-//    ellipse(x + 10 * size, y - 8 * size, 50 * size, 30 * size);
-//    ellipse(x - 10 * size, y - 8 * size, 50 * size, 30 * size);
-//  }
-//}
+  void display() {
+    fill(255, isNight ? 100 : 230);
+    noStroke();
+    ellipse(x, y, 80 * size, 50 * size);
+    ellipse(x + 25 * size, y + 12 * size, 60 * size, 35 * size);
+    ellipse(x - 25 * size, y + 12 * size, 60 * size, 35 * size);
+    ellipse(x + 10 * size, y - 8 * size, 50 * size, 30 * size);
+    ellipse(x - 10 * size, y - 8 * size, 50 * size, 30 * size);
+  }
+}
 
-//class Star {
-//  float x, y, brightness;
-//  Star(float x, float y) {
-//    this.x = x;
-//    this.y = y;
-//    this.brightness = random(100, 255);
-//  }
+class Star {
+  float x, y, brightness;
+  Star(float x, float y) {
+    this.x = x;
+    this.y = y;
+    this.brightness = random(100, 255);
+  }
   
-//  void display() {
-//    fill(255, brightness);
-//    noStroke();
-//    ellipse(x, y, 2, 2);
+  void display() {
+    fill(255, brightness);
+    noStroke();
+    ellipse(x, y, 2, 2);
     
-//    // Efek berkilau
-//    if (random(1) < 0.1) {
-//      stroke(255, brightness/2);
-//      strokeWeight(1);
-//      line(x-4, y, x+4, y);
-//      line(x, y-4, x, y+4);
-//      noStroke();
-//    }
-//  }
-//}
+    // Efek berkilau
+    if (random(1) < 0.1) {
+      stroke(255, brightness/2);
+      strokeWeight(1);
+      line(x-4, y, x+4, y);
+      line(x, y-4, x, y+4);
+      noStroke();
+    }
+  }
+}
 
-//void initClouds() {
-//  clouds.add(new Cloud(100, 80, 0.4, 1.0));
-//  clouds.add(new Cloud(300, 100, 0.3, 1.2));
-//  clouds.add(new Cloud(600, 70, 0.2, 0.8));
-//  clouds.add(new Cloud(800, 90, 0.5, 1.1));
-//  clouds.add(new Cloud(1000, 110, 0.35, 0.9));
-//}
+void initClouds() {
+  clouds.add(new Cloud(100, 80, 0.4, 1.0));
+  clouds.add(new Cloud(300, 100, 0.3, 1.2));
+  clouds.add(new Cloud(600, 70, 0.2, 0.8));
+  clouds.add(new Cloud(800, 90, 0.5, 1.1));
+  clouds.add(new Cloud(1000, 110, 0.35, 0.9));
+}
 
-//void initStars() {
-//  for (int i = 0; i < 200; i++) {
-//    stars.add(new Star(random(width), random(height/2)));
-//  }
-//}
+void initStars() {
+  for (int i = 0; i < 200; i++) {
+    stars.add(new Star(random(width), random(height/2)));
+  }
+}
 
-//void drawMovingClouds() {
-//  for (Cloud c : clouds) {
-//    c.move();
-//    c.display();
-//  }
-//}
+void drawMovingClouds() {
+  for (Cloud c : clouds) {
+    c.move();
+    c.display();
+  }
+}
 
-//void drawStars() {
-//  for (Star s : stars) {
-//    s.display();
-//  }
-//}
+void drawStars() {
+  for (Star s : stars) {
+    s.display();
+  }
+}
 
-//// Fungsi awan dari kode lama (tetap dipertahankan)
-//void drawCloud(float x, float y) {
-//  fill(255);
-//  noStroke();
-//  ellipse(x, y, 40, 30);
-//  ellipse(x + 20, y + 5, 40, 30);
-//  ellipse(x - 20, y + 5, 40, 30);
-//  ellipse(x, y + 10, 40, 30);
-//}
+// Fungsi awan dari kode lama (tetap dipertahankan)
+void drawCloud(float x, float y) {
+  fill(255);
+  noStroke();
+  ellipse(x, y, 40, 30);
+  ellipse(x + 20, y + 5, 40, 30);
+  ellipse(x - 20, y + 5, 40, 30);
+  ellipse(x, y + 10, 40, 30);
+}
 
-//void drawRiverRipples() {
-//  for (Ripple r : ripples) {
-//    r.move();
-//    r.display();
-//  }
-//}
+void drawRiverRipples() {
+  for (Ripple r : ripples) {
+    r.move();
+    r.display();
+  }
+}
 
-//// Update drawSpeechBox to accept alpha and use it for all fill/stroke/text
-//void drawSpeechBox(String speaker, String text, int x, int y, int w, int h, int alpha) {
-//  // Box background
-//  fill(20, 22, 40, alpha); // dark blue
-//  stroke(80, 80, 120, alpha); // lighter border
-//  strokeWeight(4);
-//  rect(x, y, w, h, 0);
+// Update drawSpeechBox to accept alpha and use it for all fill/stroke/text
+void drawSpeechBox(String speaker, String text, int x, int y, int w, int h, int alpha) {
+  // Box background
+  fill(20, 22, 40, alpha); // dark blue
+  stroke(80, 80, 120, alpha); // lighter border
+  strokeWeight(4);
+  rect(x, y, w, h, 0);
 
-//  // Pixel corners (optional, for extra style)
-//  int cornerSize = 12;
-//  fill(60, 60, 100, alpha);
-//  noStroke();
-//  rect(x, y, cornerSize, cornerSize);
-//  rect(x + w - cornerSize, y, cornerSize, cornerSize);
-//  rect(x, y + h - cornerSize, cornerSize, cornerSize);
-//  rect(x + w - cornerSize, y + h - cornerSize, cornerSize, cornerSize);
+  // Pixel corners (optional, for extra style)
+  int cornerSize = 12;
+  fill(60, 60, 100, alpha);
+  noStroke();
+  rect(x, y, cornerSize, cornerSize);
+  rect(x + w - cornerSize, y, cornerSize, cornerSize);
+  rect(x, y + h - cornerSize, cornerSize, cornerSize);
+  rect(x + w - cornerSize, y + h - cornerSize, cornerSize, cornerSize);
 
-//  // Speaker name
-//  fill(150, 150, 200, alpha);
-//  textAlign(LEFT, TOP);
-//  textSize(24);
-//  text(speaker, x + 20, y + 10);
+  // Speaker name
+  fill(150, 150, 200, alpha);
+  textAlign(LEFT, TOP);
+  textSize(24);
+  text(speaker, x + 20, y + 10);
 
-//  // Speech text
-//  fill(255, alpha);
-//  textSize(20);
-//  textLeading(28);
-//  text(text, x + 20, y + 50, w - 40, h - 60);
-//}
+  // Speech text
+  fill(255, alpha);
+  textSize(20);
+  textLeading(28);
+  text(text, x + 20, y + 50, w - 40, h - 60);
+}
 
 
-//// ==========================
-////     Kontrol
-//// ==========================
-//void keyPressed() {
-//  if (key == 'r' || key == 'R') {
-//    // Reset
-//    timeOfDay = 0;
-//    isNight = false;
-//    generateBackground();
-//  }
-//}
+// ==========================
+//     Kontrol
+// ==========================
+void keyPressed() {
+  if (key == 'r' || key == 'R') {
+    // Reset
+    timeOfDay = 0;
+    isNight = false;
+    generateBackground();
+  }
+}
